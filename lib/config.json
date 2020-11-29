@@ -1,0 +1,6 @@
+{
+    "host" : "localhost",
+    "port" : 4040,
+    "public_folder" : "./www",
+    "allowed_files" : ["*"]
+}
