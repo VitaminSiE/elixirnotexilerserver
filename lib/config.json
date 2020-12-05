@@ -2,5 +2,9 @@
     "host" : "localhost",
     "port" : 4040,
     "public_folder" : "./www",
-    "allowed_files" : ["*"]
+    "allowed_files" : ["*"],
+    "error_messages" : {
+        "404" : "file/404.html",
+        "400" : "string/Bad Request"
+    }
 }

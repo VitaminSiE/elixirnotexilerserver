@@ -4,8 +4,7 @@ defmodule Elixirnotexilerserver do
   use Task
 
   def start(_type, _args) do
-
-    #start Config GenServer
+    # start Config GenServer
     {:ok, registry} = Elixirnotexilerserver.Config.start_link()
     Process.register(registry, :config_server)
     IO.puts("Starting Listening")
@@ -64,7 +63,10 @@ defmodule Elixirnotexilerserver do
 
             {:error, reason} ->
               if reason === :enoent do
-                :gen_tcp.send(socket, "HTTP/1.1 404\r\nContent-Type: text/plain\r\n\r\nRequested File Not found")
+                :gen_tcp.send(
+                  socket,
+                  "HTTP/1.1 404\r\nContent-Type: text/plain\r\n\r\nRequested File Not found"
+                )
               end
           end
 
@@ -98,66 +100,5 @@ defmodule Elixirnotexilerserver do
     end
 
     process_socket(socket)
-  end
-
-  def detect_request(request_raw) do
-    headers = String.split(request_raw, "\r\n")
-
-    if length(headers) > 1 do
-      [request_header_first_line | header_rest] = headers
-      request_header_first_line_seperated = String.split(request_header_first_line, " ")
-
-      if length(request_header_first_line_seperated) > 1 do
-        [method | rest_of_first_line] = request_header_first_line_seperated
-        [path | _] = rest_of_first_line
-        %{validity: :valid, method: method, path: path, header_rest: header_rest}
-      end
-    else
-      %{validity: :invalid, method: "", path: "", header_rest: ""}
-    end
-  end
-
-  def process_headers(headers) do
-    headers_list =
-      Enum.map(headers, fn line ->
-        if String.contains?(line, ":") do
-          [headerTitle | headerValue] = String.split(line, ": ")
-          headerValue = Enum.join(headerValue, ":")
-          {headerTitle, headerValue}
-        else
-          {:misformed}
-          IO.puts("Misformed header")
-        end
-      end)
-
-    headers_list
-
-    # if headers =~ "\r\n" do
-    #   header_lines = String.split(headers, "\r\n")
-
-    # else
-    #   []
-    # end
-  end
-
-  def loopsendmessage(interval, socket, loopnum) do
-    :gen_tcp.send(socket, "Hi")
-    :timer.sleep(interval)
-
-    if loopnum > 10,
-      do:
-        (
-          :gen_tcp.close(socket)
-          {:done, "Socket Closed After 10 HIs"}
-        ),
-      else: loopsendmessage(interval, socket, loopnum + 1)
-  end
-
-  def getdefinitions(word) do
-    word
-  end
-
-  def sendmessage(text, socket) do
-    :gen_tcp.send(socket, text)
   end
 end
